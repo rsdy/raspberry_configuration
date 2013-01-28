@@ -1,0 +1,9 @@
+---
+
+- hosts: pies
+  user: pi
+  sudo: True
+
+  tasks:
+    - name: id
+      command: /usr/bin/id

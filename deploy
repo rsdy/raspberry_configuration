@@ -1,0 +1,5 @@
+#!/usr/bin/ksh
+
+. env/bin/activate
+export ANSIBLE_HOSTS=./hosts
+ansible-playbook -v ./main.yml
