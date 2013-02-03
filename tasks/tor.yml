@@ -1,0 +1,11 @@
+---
+- name: install tor
+  apt: pkg=$item state=installed
+  with_items:
+    - tor
+
+- name: copy torrc into place
+  copy: src=files/etc/tor/torrc dest=/etc/tor/torrc
+  notify:
+    - restart tor
+    - fetch tor hostname

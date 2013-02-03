@@ -1,0 +1,55 @@
+---
+- name: install packages for baikal
+  apt: pkg=$item state=installed
+  with_items:
+    - nginx
+    - php5-cgi
+    - php5-sqlite
+    - php-apc
+
+#
+# php fcgi script
+- name: copy php-cgi init script to server
+  copy: src=files/etc/init.d/php-cgi dest=/etc/init.d/php-cgi
+
+- name: set php-cgi permissions
+  file: path=/etc/init.d/php-cgi mode=0755
+  notify:
+    - start php-cgi
+    
+#
+# nginx
+- name: copy baikal nginx config to server
+  copy: src=files/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-available
+
+- name: activate baikal config
+  file: src=/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-enabled/baikal.nginx state=link
+  notify:
+    - restart nginx
+
+#
+# baikal
+- name: create /var/www
+  command: mkdir -p /var/www
+
+- name: copy baikal tarball to server
+  copy: src=files/baikal-regular-$baikal_version.tgz dest=/var/www/baikal.tgz
+  register: baikal_tarball
+  # this task actually has the potential to handle versioning in the future done with ansible
+  # in the long run we want .debs anyway
+
+- name: extract baikal tarball
+  shell: tar --no-same-permissions -xzf /var/www/baikal.tgz -C /var/www
+  only_if: ${baikal_tarball.changed}
+
+- name: move baikal into place
+  command: mv /var/www/baikal-regular /var/www/baikal
+  only_if: ${baikal_tarball.changed}
+
+- name: set baikal permissions
+  shell: chown -R root:www-data /var/www/baikal && chmod -R g+rw /var/www/baikal/Specific
+  only_if: ${baikal_tarball.changed}
+
+- name: enable baikal
+  shell: echo 1>/var/www/baikal/Specific/ENABLE_INSTALL
+  only_if: ${baikal_tarball.changed}

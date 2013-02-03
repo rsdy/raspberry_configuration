@@ -3,3 +3,6 @@
 . env/bin/activate
 export ANSIBLE_HOSTS=./hosts
 ansible-playbook -v ./main.yml
+
+HOSTNAME=$(find tor_hostnames -print0 |grep -FzZ 'baikal/hostname' |xargs -0 cat)
+echo "You can start setting up your Baikal instance at: ${HOSTNAME}/admin"

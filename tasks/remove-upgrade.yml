@@ -1,0 +1,47 @@
+---
+- name: update
+  command: apt-get update
+
+- name: install dependencies for the script
+  command: apt-get install -fy python-apt
+
+- name: remove X-related packages from default install
+  apt: pkg=$item state=absent purge=yes
+  with_items:
+    - aspell
+    - desktop-base
+    - gnome-icon-theme
+    - gnome-themes-standard
+    - hunspell-en-us
+    - libaspell15
+    - libgtk2.0-common
+    - libgtk-3-common
+    - libqtgui4
+    - libwebkitgtk-1.0-0
+    - libwebkitgtk-3.0-0
+    - lxde
+    - lxde-icon-theme
+    - lxsession
+    - lxtask
+    - lxterminal
+    - omxplayer
+    - python-pygame
+    - scratch
+    - squeak-vm
+    - x11-common
+    - xserver-common
+    - zenity
+    - dillo
+    - libqt4-network
+    - libqtdbus4
+    - libqt4-xml
+    - libqtcore4
+    - cups-bsd
+    - cups-client
+    - cups-common
+
+- name: remove leftovers
+  command: apt-get autoremove --purge -y
+
+- name: upgrade
+  command: apt-get dist-upgrade -y

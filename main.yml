@@ -3,7 +3,19 @@
 - hosts: pies
   user: pi
   sudo: True
+  gather_facts: no
 
   tasks:
-    - name: id
-      command: /usr/bin/id
+    - include: tasks/remove-upgrade.yml
+    - include: tasks/baikal.yml         baikal_version=0.2.4
+    - include: tasks/tor.yml
+
+  handlers:
+    - name: restart tor
+      service: name=tor state=restarted enabled=yes
+    - name: fetch tor hostname
+      fetch: src=/var/lib/tor/baikal/hostname dest=tor_hostnames
+    - name: restart nginx
+      service: name=nginx state=restarted enabled=yes
+    - name: start php-cgi
+      shell: /etc/init.d/php-cgi start && insserv php-cgi
