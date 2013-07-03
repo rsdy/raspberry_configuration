@@ -6,6 +6,7 @@
     - php5-cgi
     - php5-sqlite
     - php-apc
+    - git
 
 #
 # php fcgi script
@@ -16,40 +17,33 @@
   file: path=/etc/init.d/php-cgi mode=0755
   notify:
     - start php-cgi
-    
+
+- name: patch php.ini
+  file: src=files/etc/php5/cgi/php.ini dest=/etc/php5/cgi/php.ini
+  notify:
+    - start php-cgi
+
 #
 # nginx
 - name: copy baikal nginx config to server
-  copy: src=files/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-available
-
-- name: activate baikal config
-  file: src=/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-enabled/baikal.nginx state=link
+  template: src=files/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-available/baikal.nginx mode=0600
+- file: src=/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-enabled/baikal.nginx state=link
   notify:
     - restart nginx
 
 #
 # baikal
-- name: create /var/www
-  command: mkdir -p /var/www
+- name: create baikal homedir
+  command: mkdir -p ${baikal_dir}
 
-- name: copy baikal tarball to server
-  copy: src=files/baikal-regular-$baikal_version.tgz dest=/var/www/baikal.tgz
-  register: baikal_tarball
-  # this task actually has the potential to handle versioning in the future done with ansible
-  # in the long run we want .debs anyway
-
-- name: extract baikal tarball
-  shell: tar --no-same-permissions -xzf /var/www/baikal.tgz -C /var/www
-  only_if: ${baikal_tarball.changed}
-
-- name: move baikal into place
-  command: mv /var/www/baikal-regular /var/www/baikal
-  only_if: ${baikal_tarball.changed}
+- name: checkout baikal
+  git: repo=https://github.com/jeromeschneider/Baikal.git dest=${baikal_dir}
+  register: baikal_git
 
 - name: set baikal permissions
-  shell: chown -R root:www-data /var/www/baikal && chmod -R g+rw /var/www/baikal/Specific
-  only_if: ${baikal_tarball.changed}
+  shell: chown -R root:www-data ${baikal_dir} && chmod -R g+rw ${baikal_dir}/Specific
+  only_if: ${baikal_git.changed}
 
 - name: enable baikal
-  shell: echo 1>/var/www/baikal/Specific/ENABLE_INSTALL
-  only_if: ${baikal_tarball.changed}
+  shell: echo 1 >${baikal_dir}/Specific/ENABLE_INSTALL
+  only_if: ${baikal_git.changed}

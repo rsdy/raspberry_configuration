@@ -8,4 +8,4 @@
   copy: src=files/etc/tor/torrc dest=/etc/tor/torrc
   notify:
     - restart tor
-    - fetch tor hostname
+    - fetch service hostname

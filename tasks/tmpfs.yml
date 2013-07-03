@@ -1,0 +1,9 @@
+---
+- name: tmpfs for /tmp
+  shell: echo tmpfs /tmp tmpfs rw,nosuid,nodev,noexec,mode=1777 0 0 >>/etc/fstab
+
+- name: /var/ subdirs as tmpfs
+  shell: echo tmpfs /var/$item tmpfs rw,nosuid,nodev,noexec,mode=0755 0 0 >>/etc/fstab
+  with_items:
+    - log
+    - lock

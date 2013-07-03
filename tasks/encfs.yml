@@ -1,0 +1,19 @@
+---
+- name: install encfs
+  apt: pkg=${item} state=installed
+  with_items:
+    - encfs
+
+- command: mkdir -p /.encrypted
+- group: name=encmgmt state=present
+- copy: src=.encrypted/.encfs6.xml dest=/.encrypted owner=root group=root mode=0600
+- copy: src=usr/local/bin/change-encrypted-pw dest=/usr/local/bin/change-encrypted-pw mode=0750 group=encmgmt
+- copy: src=usr/local/bin/unlock-encrypted dest=/usr/local/bin/unlock-encrypted mode=0750 group=encmgmt
+
+- name: set password for encrypted storage to random under credentials/<hostname>/encfs
+  command: /usr/local/bin/change-encrypted-pw passwd "${item}"
+  with_password: ../credentials/${inventory_hostname}/encfs length=30
+
+- name: mount encrypted storage
+  command: echo "${item}" |encfs -S /.encrypted /encrypted
+  with_password: ../credentials/${inventory_hostname}/encfs

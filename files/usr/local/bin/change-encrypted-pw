@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ ${#@} -lt 2 ]; then
+  echo "usage: $0 <old pw> <new pw>"
+  exit 1
+fi
+
+echo "$1\n$2\n$2" |encfsctl autopasswd /.encrypted

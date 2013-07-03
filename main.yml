@@ -1,21 +1,31 @@
 ---
-
 - hosts: pies
   user: pi
   sudo: True
   gather_facts: no
+  vars:
+    baikal_dir: /encrypted/www/baikal
 
   tasks:
     - include: tasks/remove-upgrade.yml
-    - include: tasks/baikal.yml         baikal_version=0.2.4
+    - include: tasks/encfs.yml
+    - include: tasks/baikal.yml
     - include: tasks/tor.yml
+    - include: tasks/tmpfs.yml
 
   handlers:
     - name: restart tor
       service: name=tor state=restarted enabled=yes
-    - name: fetch tor hostname
-      fetch: src=/var/lib/tor/baikal/hostname dest=tor_hostnames
+
+    - name: fetch baikal hostname
+      fetch: src=/var/lib/tor/${item}/hostname dest=tor_hostnames
+      with_items:
+        - baikal
+        - ssh
+
     - name: restart nginx
       service: name=nginx state=restarted enabled=yes
+
     - name: start php-cgi
-      shell: /etc/init.d/php-cgi start && insserv php-cgi
+      service: name=php-cgi state=started enabled=yes
+#      shell: /etc/init.d/php-cgi start && insserv php-cgi
