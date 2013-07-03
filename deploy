@@ -1,8 +1,21 @@
-#!/usr/bin/ksh
+#!/usr/bin/ksh -e
+
+tor_address() {
+	find tor_hostnames/$1 -type f -print0 |grep -FzZ "$2/hostname" |xargs -0 cat
+}
 
 . env/bin/activate
 export ANSIBLE_HOSTS=./hosts
-ansible-playbook -v ./main.yml
+ansible-playbook -vv ./main.yml $@
 
-HOSTNAME=$(find tor_hostnames -print0 |grep -FzZ 'baikal/hostname' |xargs -0 cat)
-echo "You can start setting up your Baikal instance at: ${HOSTNAME}/admin"
+set -A hostnames $(ls tor_hostnames)
+
+echo "You can reach your services at:"
+{
+	echo "hostname baikal ssh"
+	for host in ${hostnames[*]}; do
+		baikal="$(tor_address $host baikal |sed 's;$;/admin;')"
+		ssh="$(tor_address $host ssh)"
+		echo "${host} ${baikal} ${ssh}"
+	done
+} |column -t
