@@ -2,7 +2,7 @@ server {
     listen       8001;
     server_name  _;
 
-    root  {{ baikal_dir }};
+    root  {{ baikal_dir }}/html;
     index index.php;
 
     charset utf-8;

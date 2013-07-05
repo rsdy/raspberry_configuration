@@ -3,6 +3,7 @@
   apt: pkg=$item state=installed
   with_items:
     - nginx
+    - php5-cli
     - php5-cgi
     - php5-sqlite
     - php-apc
@@ -39,6 +40,12 @@
 - name: checkout baikal
   git: repo=https://github.com/jeromeschneider/Baikal.git dest=${baikal_dir}
   register: baikal_git
+
+- name: download up composer
+  shell: curl -sS https://getcomposer.org/installer | php -- --install-dir=${baikal_dir}
+
+- name: install dependencies
+  shell: cd ${baikal_dir}; php composer.phar install
 
 - name: set baikal permissions
   shell: chown -R root:www-data ${baikal_dir} && chmod -R g+rw ${baikal_dir}/Specific
