@@ -1,0 +1,24 @@
+---
+- name: install packages for php
+  apt: pkg=$item state=installed
+  with_items:
+    - nginx
+    - php5-cgi
+    - php5-sqlite
+    - php-apc
+    - git
+
+#
+# php fcgi script
+- name: copy php-cgi init script to server
+  copy: src=files/etc/init.d/php-cgi dest=/etc/init.d/php-cgi
+
+- name: set php-cgi permissions
+  file: path=/etc/init.d/php-cgi mode=0755
+  notify:
+    - start php-cgi
+
+- name: patch php.ini
+  file: src=files/etc/php5/cgi/php.ini dest=/etc/php5/cgi/php.ini
+  notify:
+    - start php-cgi
