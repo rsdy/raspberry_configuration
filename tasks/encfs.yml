@@ -15,5 +15,5 @@
   with_password: ../credentials/${inventory_hostname}/encfs length=30
 
 - name: mount encrypted storage
-  command: echo "${item}" |encfs -S /.encrypted /encrypted
+  command: /usr/local/bin/unlock-encrypted "${item}"
   with_password: ../credentials/${inventory_hostname}/encfs
