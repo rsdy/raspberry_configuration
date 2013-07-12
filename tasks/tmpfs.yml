@@ -1,4 +1,7 @@
 ---
+- name: apt config
+  copy: src=files/etc/apt/apt.conf.d/10tmpfs dest=/etc/apt/apt.conf.d/10tmpfs
+
 - name: tmpfs for /tmp
   shell: echo tmpfs /tmp tmpfs rw,nosuid,nodev,noexec,mode=1777 0 0 >>/etc/fstab
 
