@@ -4,8 +4,8 @@
   with_items:
     - php5-cli
 
-#
-# nginx
+##
+## nginx
 - name: copy baikal nginx config to server
   template: src=files/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-available/baikal.nginx mode=0600
 - file: src=/etc/nginx/sites-available/baikal.nginx dest=/etc/nginx/sites-enabled/baikal.nginx state=link
@@ -14,23 +14,25 @@
 
 #
 # baikal
-- name: create baikal homedir
-  command: mkdir -p ${baikal_dir}
-
 - name: checkout baikal
-  git: repo=https://github.com/jeromeschneider/Baikal.git dest=${baikal_dir}
+  git: repo=https://github.com/jeromeschneider/Baikal.git dest={{ baikal_dir }}
   register: baikal_git
 
 - name: download up composer
-  shell: curl -sS https://getcomposer.org/installer | php -- --install-dir=${baikal_dir}
+  shell: curl -sS https://getcomposer.org/installer | php -- --install-dir={{ baikal_dir }}
+  when: not baikal_git.before
 
 - name: install dependencies
-  shell: cd ${baikal_dir}; php composer.phar install
+  shell: cd {{ baikal_dir }}; php composer.phar install
 
 - name: set baikal permissions
-  shell: chown -R root:www-data ${baikal_dir} && chmod -R g+rw ${baikal_dir}/Specific
-  only_if: ${baikal_git.changed}
+  file: path={{ baikal_dir }} owner=root group=www-data recurse=yes state=directory
+  when: baikal_git.changed
 
-- name: enable baikal
-  shell: echo 1 >${baikal_dir}/Specific/ENABLE_INSTALL
-  only_if: ${baikal_git.changed}
+- name: Specific is writable
+  file: path={{ baikal_dir }}/Specific mode=0770 recurse=yes state=directory
+  when: baikal_git.changed
+
+- name: enable baikal install
+  copy: content="" dest={{ baikal_dir }}/Specific/ENABLE_INSTALL
+  when: not baikal_git.before
