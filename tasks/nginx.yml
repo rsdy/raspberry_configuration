@@ -1,0 +1,13 @@
+---
+- name: install nginx
+  apt: pkg=$item state=installed
+  with_items:
+    - nginx
+
+- name: create /var/log/nginx before checking the config (DIRTY!@#$)
+  lineinfile: dest=/etc/init.d/nginx regexp="DAEMON -t" line="mkdir -p /var/log/nginx; $DAEMON -t $DAEMON_OPTS" backup=yes
+  notify: restart nginx
+
+- name: update nginx config
+  copy: src=etc/nginx/nginx.conf dest=/etc/nginx/nginx.conf
+  notify: restart nginx
