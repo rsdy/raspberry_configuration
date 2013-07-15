@@ -19,3 +19,7 @@ echo "You can reach your services at:"
 		echo "${host} ${baikal} ${ssh}"
 	done
 } |column -t
+
+echo "!!
+!! Your passwords are stored in clear text under credentials/ !! Make sure you change them ASAP !!
+!!"
