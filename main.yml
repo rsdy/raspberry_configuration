@@ -29,4 +29,6 @@
 
     - name: start php-cgi
       service: name=php-cgi state=started enabled=yes
-#      shell: /etc/init.d/php-cgi start && insserv php-cgi
+
+    - name: restart sshd
+      service: name=ssh state=restarted enabled=yes
