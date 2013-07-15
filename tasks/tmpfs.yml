@@ -3,10 +3,9 @@
   copy: src=files/etc/apt/apt.conf.d/10tmpfs dest=/etc/apt/apt.conf.d/10tmpfs
 
 - name: tmpfs for /tmp
-  shell: echo tmpfs /tmp tmpfs rw,nosuid,nodev,noexec,mode=1777 0 0 >>/etc/fstab
+  lineinfile: dest=/etc/fstab regexp="^tmpfs /tmp" line="tmpfs /tmp tmpfs rw,nosuid,nodev,noexec,mode=1777 0 0"
 
 - name: /var/ subdirs as tmpfs
-  shell: echo tmpfs /var/$item tmpfs rw,nosuid,nodev,noexec,mode=0755 0 0 >>/etc/fstab
+  lineinfile: dest=/etc/fstab regexp="^tmpfs {{ item }}" line="tmpfs {{ item }} tmpfs rw,nosuid,nodev,noexec,mode=0755 0 0"
   with_items:
-    - log
-    - lock
+    - /var/log
