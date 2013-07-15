@@ -2,7 +2,6 @@
 - name: install packages for php
   apt: pkg=$item state=installed
   with_items:
-    - nginx
     - php5-cgi
     - php5-sqlite
     - php-apc
