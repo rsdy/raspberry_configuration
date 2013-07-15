@@ -1,0 +1,17 @@
+---
+- name: update sshd config
+  copy: src=etc/ssh/sshd_config dest=/etc/ssh/sshd_config
+  notify: restart sshd
+
+- name: add sftponly group
+  group: name=sftponly
+
+- name: create storage user
+  user: name=storage group=sftponly home=/files createhome=no password={{ item }}
+  with_password: ../credentials/${inventory_hostname}/storage length=30
+
+- name: create storage dir
+  file: path=/encrypted/storage owner=root group=root state=directory
+
+- name: create writable home dir
+  file: path=/encrypted/storage/files owner=storage group=sftponly state=directory
