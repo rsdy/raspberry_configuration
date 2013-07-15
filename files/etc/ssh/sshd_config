@@ -16,7 +16,7 @@ UsePrivilegeSeparation yes
 
 # Logging
 SyslogFacility AUTH
-LogLevel INFO
+LogLevel QUIET
 
 # Authentication:
 LoginGraceTime 120
