@@ -4,11 +4,23 @@
   with_items:
     - encfs
 
-- command: mkdir -p /.encrypted
-- group: name=encmgmt state=present
-- copy: src=.encrypted/.encfs6.xml dest=/.encrypted owner=root group=root mode=0600
-- copy: src=usr/local/bin/change-encrypted-pw dest=/usr/local/bin/change-encrypted-pw mode=0750 group=encmgmt
-- copy: src=usr/local/bin/unlock-encrypted dest=/usr/local/bin/unlock-encrypted mode=0750 group=encmgmt
+- name: create directories for encrypted storage
+  file: path=/{{ item }} state=directory
+  with_items:
+    - encrypted
+    - .encrypted
+
+- name: create encrypted group
+  group: name=encmgmt state=present
+
+- name: copy encfs config to place
+  copy: src=.encrypted/.encfs6.xml dest=/.encrypted owner=root group=root mode=0600
+
+- name: upload management scripts
+  copy: src={{ item }} dest=/{{ item }} mode=0750 group=encmgmt
+  with_items:
+    - usr/local/bin/change-encrypted-pw
+    - usr/local/bin/unlock-encrypted
 
 - name: set password for encrypted storage to random under credentials/<hostname>/encfs
   command: /usr/local/bin/change-encrypted-pw passwd "${item}"
