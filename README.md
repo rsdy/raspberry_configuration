@@ -25,6 +25,7 @@ You need the following things on the host that runs these scripts:
  * ksh, for running the scripts in the root of this repo
  * python, python-dev, virtualenv, pip
  * pycrypto will be compiled, dependencies may arise
+ * ssh-agent having your keys enabled on the Raspberry Pi
 
 Usage:
 
