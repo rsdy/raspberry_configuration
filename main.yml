@@ -8,18 +8,20 @@
 
   tasks:
     - include: tasks/remove-upgrade.yml
-    - include: tasks/encfs.yml
+    - include: tasks/tmpfs.yml
+    - include: tasks/nginx.yml
     - include: tasks/php-fcgi.yml
+    - include: tasks/encfs.yml
     - include: tasks/baikal.yml
     - include: tasks/tor.yml
-    - include: tasks/tmpfs.yml
+    - include: tasks/ssh-storage.yml
 
   handlers:
     - name: restart tor
       service: name=tor state=restarted enabled=yes
 
-    - name: fetch baikal hostname
-      fetch: src=/var/lib/tor/${item}/hostname dest=tor_hostnames
+    - name: fetch service hostname
+      fetch: src=/var/lib/tor/{{ item }}/hostname dest=tor_hostnames
       with_items:
         - baikal
         - ssh
