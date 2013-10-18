@@ -5,8 +5,16 @@ This repository contains the configuration of a basic KitchenSync (TODO: working
 title) instance. The aim is to keep the configuration of the device at one
 place, so that all modifications are trackable and easily reproducible.
 
-How-To
-------
+Install
+-------
+Log in to your Raspberry Pi, run `raspi-config`, then simply
+
+    curl https://raw.github.com/KitchenSync/raspberry_configuration/master/install.sh |sudo sh
+
+It's going to take a while. That's fine.
+
+Oldschool Install
+-----------------
 
 The following things are expected to be done on the Raspberry Pi:
 
